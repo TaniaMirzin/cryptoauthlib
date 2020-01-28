@@ -31,6 +31,7 @@
 #ifndef ATCA_COMPILER_H_
 #define ATCA_COMPILER_H_
 
+
 #if defined(__clang__)
 /* Clang/LLVM. ---------------------------------------------- */
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -50,7 +51,26 @@
 #define ATCA_UINT64_HOST_TO_BE(x)  __builtin_bswap64(x)
 #define ATCA_UINT64_BE_TO_HOST(x)  __builtin_bswap64(x)
 #endif
-
+#elif defined __ICCARM__
+/* IAR ARM ------------------------------------------- */
+#include <intrinsics.h>
+#if __LITTLE_ENDIAN__ == 0
+#define ATCA_UINT16_HOST_TO_LE(x)  __REV16(x)
+#define ATCA_UINT16_LE_TO_HOST(x)  __REV16(x)
+#define ATCA_UINT32_HOST_TO_LE(x)  __REV(x)
+#define ATCA_UINT32_HOST_TO_BE(x)  (x)
+#define ATCA_UINT32_BE_TO_HOST(x)  (x)
+#define ATCA_UINT64_HOST_TO_BE(x)  (x)
+#define ATCA_UINT64_BE_TO_HOST(x)  (x)
+#else
+#define ATCA_UINT16_HOST_TO_LE(x)  (x)
+#define ATCA_UINT16_LE_TO_HOST(x)  (x)
+#define ATCA_UINT32_HOST_TO_LE(x)  (x)
+#define ATCA_UINT32_HOST_TO_BE(x)  __REV(x)
+#define ATCA_UINT32_BE_TO_HOST(x)  __REV(x)
+#define ATCA_UINT64_HOST_TO_BE(x)  ((uint64_t)__REV((uint32_t)x)<<32 + (uint64_t)__REV((uin32_t)(x>>32)))
+#define ATCA_UINT64_BE_TO_HOST(x)  ((uint64_t)__REV((uint32_t)x)<<32 + (uint64_t)__REV((uin32_t)(x>>32)))
+#endif
 #elif defined(__ICC) || defined(__INTEL_COMPILER)
 /* Intel ICC/ICPC. ------------------------------------------ */
 
